@@ -1,0 +1,89 @@
+server:
+  port: 23145  # 默认端口
+  tomcat:
+    uri-encoding: UTF-8 # 默认编码
+spring:
+  session:           #session 超时设置
+    timeout: 1800
+  datasource:
+    dynamic: # druid连接池配置
+      primary: master #默认数据源
+      datasource:
+        master: #主库配置
+          username: YZY@7808423C343F447E85D1E0167DA1D0D3  #TESTDB
+          password: YZY@7808423C343F447E85D1E0167DA1D0D3  #TESTDB
+          driver-class-name: ${datasource_driver_class_name:com.mysql.cj.jdbc.Driver}
+          url: ${datasource_url:jdbc:mysql://127.0.0.1:3306/TESTDB?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+          druid:
+            initial-size: 5 #启动程序时，在连接池中初始化多少个连接
+            max-active: 20 #连接池中最多支持多少个活动会话
+            min-idle: 5 #回收空闲连接时，将保证至少有minIdle个连接
+            max-wait: 60000 #程序向连接池中请求连接时,超过maxWait的值后，认为本次请求失败，即连接池
+            filters: stat,wall,slf4j
+        slave: #从库配置
+          username: YZY@7808423C343F447E85D1E0167DA1D0D3  #TESTDB
+          password: YZY@7808423C343F447E85D1E0167DA1D0D3  #TESTDB
+          driver-class-name: ${datasource_driver_class_name:com.mysql.cj.jdbc.Driver}
+          url: ${datasource_url:jdbc:mysql://127.0.0.1:3306/TESTDB?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+          druid:
+            initial-size: 5 #启动程序时，在连接池中初始化多少个连接
+            max-active: 20 #连接池中最多支持多少个活动会话
+            min-idle: 5 #回收空闲连接时，将保证至少有minIdle个连接
+            max-wait: 60000 #程序向连接池中请求连接时,超过maxWait的值后，认为本次请求失败，即连接池
+            filters: stat,wall,slf4j
+dubbo:
+  provider:
+    filter: dubboFliter #调用拦截路由
+    parameters:
+      status: gray
+      version: 1.0.0 #自定的一个版本属性
+    loadbalance: grayLoadBalance #负载均衡模式 roundRobin，random ,leastActive,consistentHash,grayLoadBalance（自定义）
+  application:
+    name: yzy-provider  #给provider起的名称
+  registry:
+    protocol: zookeeper #表示注册的地址，不一定非得是zookeeper
+    address: 127.0.0.1:2181
+  protocol:
+    name: dubbo
+    port: 20887  #注册的端口号，多个提供者使用的port需要区分开来
+  scan:
+    base-packages: com.log #表示扫描哪些包下面的服务
+mybatis-plus:
+  global-config:
+    db-config:
+      #逻辑已删除值
+      logic-delete-value: 1
+      #逻辑未删除值
+      logic-not-delete-value: 0
+    sql-parser-cache: true # 是否缓存 Sql 解析，默认不缓存
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  type-enums-package: me.gacl.*
+  mapper-locations: classpath*:mapping/*/*Mapper.xml  #MyBatis Mapper 所对应的 XML 文件位置
+#actuator端口
+management:
+  server:
+    port: 19001
+  #修改访问路径  2.0之前默认是/   2.0默认是 /actuator  可以通过这个属性值修改
+  endpoints:
+    web:
+      base-path: /actuator
+      #开放所有页面节点  默认只开启了health、info两个节点
+      exposure:
+        include: '*'
+  #显示健康具体信息  默认不会显示详细信息
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      enabled: true  #启用shutdown端点，以便支持优雅停机
+config:
+  health:
+    filestore:
+      filepath: /
+      thresholdBytes: 10485750
+  decrypt:
+    key: Yzy@1995217
+  exception:
+    code: 999999
+    info: 系统繁忙,请稍后再试！
